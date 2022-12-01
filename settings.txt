@@ -1,1 +1,2 @@
 money:100
+version:v1.1

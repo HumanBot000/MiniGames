@@ -1,16 +1,33 @@
 import os
 import random
 import re
-
+import psutil
+import time
+import random
+import math
+import platform
+import GPUtil
+import colorama
+from datetime import datetime
 from colorama import Fore
 
-
+def  disk_adjustsize(size):
+    factor = 1024
+    for i in ["B", "KB", "MB", "GB", "TB", "PB"]:
+        if size > factor:
+            size = size / factor
+        else:
+            return f"{size:.3f}{i}"
 def get_coins():
     settings_file = open("settings.txt", "r+")
     coins = settings_file.readlines()[0]
     coins = int(re.split(":", coins)[1])
     return coins
-
+def get_version():
+    settings_file = open("settings.txt", "r+")
+    version = settings_file.readlines()[1]
+    version = str(re.split(":", version)[1])
+    return version
 
 def clear_console():
     if os.name == 'nt':
@@ -31,7 +48,7 @@ def settings(coins):
     clear_console()
     print(Fore.BLUE)
     try:
-        setting = int(input("Please select a setting:   [1] Give Coins | [2] Remove Coins | [3] Exit:"))
+        setting = int(input("Please select a setting:  [0] Back | [1] Give Coins | [2] Remove Coins | [3] Info/Bugs:"))
     except Exception:
         print(Fore.RED)
         print("Please enter a valid  number")
@@ -46,7 +63,7 @@ def settings(coins):
             settings(coins)
         coins = coins + coins_to_give
         update_coins(coins)
-    if setting == 2:
+    elif setting == 2:
         try:
             coins_to_clear = int(input("How much Coins do you want to remove? Please enter the amount:"))
         except Exception:
@@ -55,8 +72,79 @@ def settings(coins):
             settings(coins)
         coins = coins - coins_to_clear
         update_coins(coins)
-
-    if setting == 3:
+    elif setting == 3:
+        allowed = str(input("To make it a lot easier to debug we collect some datas like operating system and free memory\n"
+                            "is that okay for you? (y/n):"))
+        if allowed == "y":
+            disk_io = psutil.disk_io_counters()
+            partitions = psutil.disk_partitions()
+            virtual_memory = psutil.virtual_memory()
+            uname = platform.uname()
+            boot_time_timestamp = psutil.boot_time()
+            bt = datetime.fromtimestamp(boot_time_timestamp)
+            swap = psutil.swap_memory()
+            if_addrs = psutil.net_if_addrs()
+            print(f"{Fore.LIGHTBLUE_EX}Mini Games is a collection od classic mini and casino games with it's own money system.\n"
+                  f"If you want to create a bug/issue report at https://github.com/HumanBot000/MiniGames/issues please copy the text below."
+                  f"This makes it a lot easier to debug:\n\n"
+                  f"{Fore.RED}\n")
+            print("-" * 40, "system info read out with python", "-" * 40)
+            print(f"Version:{get_version()}")
+            print(f"System: {uname.system}")
+            print(f"Node Name: {uname.node}")
+            print(f"Release: {uname.release}")
+            print(f"Version: {uname.version}")
+            print(f"Machine: {uname.machine}")
+            print(f"Processor: {uname.processor}")
+            #print(f"Boot Time: {bt.day}.{bt.month}.{bt.year}         {bt.hour}:{bt.minute}: {bt.second} ")
+            print("Actual Cores:", psutil.cpu_count(logical=False))
+            print("Logical Cores:", psutil.cpu_count(logical=True))
+            print(f"Max Frequency:, {psutil.cpu_freq().max:.1f}Mhz")
+            print(f"Curren Frequency: {psutil.cpu_freq().current:.1f}Mhz")
+            print(f"Cpu usage: {psutil.cpu_percent()}%")
+            print("Utilization per core:")
+            for i, perc in enumerate(psutil.cpu_percent(percpu=True, interval=1)):
+                print(f"Core {i}: {perc} %")
+            print(f"Total RAM: {disk_adjustsize(virtual_memory.total)}")
+            print(f"Available RAM: {disk_adjustsize(virtual_memory.available)}")
+            print(f"Used RAM: {virtual_memory.used}")
+            print(f"Percentage of available  RAM: {virtual_memory.percent}%")
+            print(f"Total SWAP: {disk_adjustsize(swap.total)}")
+            print(f"Free SWAP: {disk_adjustsize(swap.free)}")
+            print(f"Used SWAP: {disk_adjustsize(swap.used)}")
+            print(f"Percentage SWAP: : {swap.percent}%")
+            for p in partitions:
+                print(f"Device: {p.device}")
+                print(f"\tMountpoint: {p.mountpoint}")
+                print(f"\tFile system type: {p.fstype}")
+                try:
+                    partitions_usage = psutil.disk_usage(p.mountpoint)
+                except PermissionError:
+                    print(Fore.RED)
+                    print("Error no permissions")
+                    continue
+                #print(f"Total Size: {disk_adjustsize(partitions_usage.total)}")
+                #print(f"Used: {disk_adjustsize(partitions_usage.used)}")
+                print(f"Free: {disk_adjustsize(partitions_usage.free)}")
+                #print(f"Percentage: {partitions_usage.percent}%")
+                print(f"Read since boot: {disk_adjustsize(disk_io.read_bytes)}")
+                print(f"Written since boot {disk_adjustsize(disk_io.write_bytes)}")
+                print("-" * 40, "GPU/Graphic Card", "-" * 40)
+                gpus = GPUtil.getGPUs()
+                for gpu in gpus:
+                    print(f"ID: {gpu.id}")
+                    print(f"Name: {gpu.name}")
+                    print(f"\tLoad: {gpu.load * 100}%")
+                    print(f"Free mem: {gpu.memoryFree}MB")
+                    print(f"Used mem: {gpu.memoryUsed}MB")
+                    print(f"\tTotal Mem: {gpu.memoryTotal}MB")
+                    print(f"Temperature: {gpu.temperature}°C")
+        else:
+            print(f"{Fore.LIGHTBLUE_EX}Mini Games is a collection od classic mini and casino games with it's own money system.\n"
+                  f"Please create a bug/issue report at https://github.com/HumanBot000/MiniGames/issues")
+        input()
+        print(Fore.RESET)
+    elif setting == 0:
         main()
     print(Fore.RESET)
     settings(coins)
@@ -207,8 +295,10 @@ def game_guess_the_number():
             game_guess_the_number()
     if game == 0:
         print(Fore.GREEN)
-        # TODO rules
-        print("")
+        print("Inputs: \n bet: [a number between 0 and your  coins] the bet you like to set \n range[1-3] \n guess[0-range] your guess \n"
+              "First you set your coins to bet\n"
+              "After that you decide for a range than higher the range is, than higher is also the multiplier\n"
+              "Then you have to choose a number.Your goal is to have the same number like the bot.")
         input()
         print(Fore.RESET)
         game_black_jack()
@@ -314,16 +404,16 @@ def get_game():
     print(Fore.RESET)
     print(Fore.CYAN)
     try:
-        game = int(input("Please select a game:     [0] Guess the Number | [1] Black Jack | [2] Back:"))
+        game = int(input("Please select a game:    [0] Back | [1] Guess the Number | [2] Black Jack:"))
     except Exception:
         print(Fore.RED)
         print("Please enter a valid number")
         get_game()
-    if game == 0:
-        game_guess_the_number()
     if game == 1:
+        game_guess_the_number()
+    elif game == 2:
         game_black_jack()
-    if game == 2:
+    elif game == 0:
         main()
 
 
