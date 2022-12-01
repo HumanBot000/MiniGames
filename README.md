@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Installation (For Windows)
 
  1. Go to releases and download the latest full release
