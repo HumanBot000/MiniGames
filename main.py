@@ -93,20 +93,26 @@ def game_black_jack():
             print(Fore.MAGENTA)
             try:
                 option = int(input(
-                    f"The Maximum is 20,you have {own_amount} what do you like to do? [0] Reveal Dealers Score | [1] Raise Score:"))
+                    f"The Maximum is 20,you have{Fore.RED} {own_amount} {Fore.MAGENTA}what do you like to do? [0] Reveal Dealers Score | [1] Raise Score:"))
             except Exception:
                 print(Fore.RED)
                 print("Please enter a valid number")
             else:
                 if option == 0:
-                    dealer_amount = random.randint(15, 20)
+                    dealer_amount = 19
+                    while True:
+                        probability = random.randint(1, 100)
+                        if probability <=70 and probability >0: #70 Prozent
+                            dealer_amount = dealer_amount - 1
+                        else:
+                            break
                     if own_amount == dealer_amount:
                         print(Fore.YELLOW)
                         print("Its a tie you get your coins back")
                         print(Fore.RESET)
                         coins = coins + bet
                         update_coins(coins)
-                        time.sleep(3)
+                        input()
                         game_black_jack()
                     elif own_amount > dealer_amount:
                         print(Fore.GREEN)
@@ -115,14 +121,14 @@ def game_black_jack():
                         print(Fore.RESET)
                         coins = coins + bet + bet
                         update_coins(coins)
-                        time.sleep(3)
+                        input()
                         game_black_jack()
                     elif own_amount < dealer_amount:
                         print(Fore.RED)
                         print(f"You loosed the dealer had {dealer_amount} points your coins are gone")
                         print(Fore.RESET)
                         update_coins(coins)
-                        time.sleep(3)
+                        input()
                         game_black_jack()
                 if option == 1:
                     own_amount = own_amount + random.randint(1, 5)
@@ -131,10 +137,21 @@ def game_black_jack():
                         print(f"You Lose your score is now {own_amount} your points are gone")
                         print(Fore.RESET)
                         update_coins(coins)
-                        time.sleep(3)
+                        input()
                         game_black_jack()
-    if game == 1:
-        pass
+    if game == 0:
+        print(Fore.GREEN)
+        print("Inputs: \n bet: [a number between 0 and your  coins] the bet you like to set \n action:[0,1]\n "
+              "The Game: after you set your bet you have to decide if you raise your score or compare to dealer. \n "
+              "If you raise the score it will be raised by a random number between 1 and 5.\n"
+              "The goal is to reach the highest score.But be carefully if your score gets over 20 the game will end any you loes your coins.\n"
+              "If you compare to the dealer the dealer starts at 19 and with a probability of 70% it will go one lower.\n"
+              "Coins: You lose = bet is gone\n"
+              "Tie = get your bet back\n"
+              "Win = multiple by 2 ")
+        input()
+        print(Fore.RESET)
+        game_black_jack()
     if game == 2:
         get_game()
 
@@ -172,8 +189,8 @@ def main():
     print(Fore.RESET)
     if game == 0:
         clear_console()
-        print(Fore.CYAN)
-        print("""Actions: You have to enter the number in the brackets([ and ]) before the Action
+        print(Fore.GREEN)
+        print("""Actions: You have to enter the number in the brackets([ and ]) before the Action this is how to navigate through menus
             Economy:You have an specific balance on your bank you will see it at the main screen.If you win in games you will multiple your money.If you haven´t enough money you can cheat some in the settings
         """)
         main()
