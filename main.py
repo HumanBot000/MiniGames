@@ -1,7 +1,6 @@
 import os
 import random
 import re
-import time
 
 from colorama import Fore
 
@@ -62,6 +61,160 @@ def settings(coins):
     print(Fore.RESET)
     settings(coins)
 
+def validate_int(int):
+    try:
+        int = int(int)
+    except Exception:
+        return False
+    else:
+        return True
+def game_guess_the_number():
+    clear_console()
+    print(Fore.RESET)
+    print(Fore.CYAN)
+    try:
+        game = int(input("Please select a Task:    [0] Rules | [1] Play  | [2] Back:"))
+    except Exception:
+        print(Fore.RED)
+        print("Please enter a valid number")
+        game_guess_the_number()
+    if game == 1:
+        coins = get_coins()
+        print(Fore.YELLOW)
+        try:
+            bet = int(input("How much do you bet?:"))
+            if coins < bet:
+                print(Fore.RED)
+                print(f"You only have {coins} coins")
+                print(Fore.RESET)
+                game_guess_the_number()
+        except Exception:
+            print(Fore.RED)
+            print("Please enter a valid number")
+            game_guess_the_number()
+        try:
+            print(Fore.BLUE)
+            mode = int(input("Which range do you choose? [0] 0-10 (5x) | [1] 0-100(x50) | [2] 0-1000(x750):"))
+            print(Fore.RESET)
+        except Exception:
+            print(Fore.RED)
+            print("Please enter a valid number")
+            game_guess_the_number()
+        coins = coins - bet
+        if mode == 0:
+            clear_console()
+            print(Fore.CYAN)
+            while True:
+                try:
+                    print(Fore.CYAN)
+                    number_user = int(input("Please enter a number between 0 and 10:"))
+                    if not number_user <= 10:
+                        print(Fore.RED)
+                        print("Please enter a valid number")
+                        print(Fore.RESET)
+                    else:
+                        break
+                except Exception:
+                    print(Fore.RED)
+                    print("Please enter a valid number")
+                    print(Fore.RESET)
+            number_bot = random.randint(0, 10)
+            if number_user == number_bot:
+                print(Fore.GREEN)
+                print("You Won your coins will be multiply by x5")
+                print(Fore.RESET)
+                coins_to_give = bet * 5
+                coins = coins + coins_to_give
+                update_coins(coins)
+                input()
+                game_guess_the_number()
+            else:
+                print(Fore.RED)
+                print(f"You lose the bot had {number_bot} all your coins are gone")
+                print(Fore.RESET)
+                update_coins(coins)
+                input()
+                game_guess_the_number()
+        elif mode == 1:
+            clear_console()
+            print(Fore.CYAN)
+            while True:
+                try:
+                    print(Fore.CYAN)
+                    number_user = int(input("Please enter a number between 0 and 100:"))
+                    if not number_user <= 100:
+                        print(Fore.RED)
+                        print("Please enter a valid number")
+                        print(Fore.RESET)
+                    else:
+                        break
+                except Exception:
+                    print(Fore.RED)
+                    print("Please enter a valid number")
+                    print(Fore.RESET)
+            number_bot = random.randint(0, 100)
+            if number_user == number_bot:
+                print(Fore.GREEN)
+                print("You Won your coins will be multiply by x50")
+                print(Fore.RESET)
+                coins_to_give = bet * 50
+                coins = coins + coins_to_give
+                update_coins(coins)
+                input()
+                game_guess_the_number()
+            else:
+                print(Fore.RED)
+                print(f"You lose the bot had {number_bot} all your coins are gone")
+                print(Fore.RESET)
+                update_coins(coins)
+                input()
+                game_guess_the_number()
+        elif mode == 2:
+            clear_console()
+            print(Fore.CYAN)
+            while True:
+                try:
+                    print(Fore.CYAN)
+                    number_user = int(input("Please enter a number between 0 and 1000:"))
+                    if not number_user <= 1000:
+                        print(Fore.RED)
+                        print("Please enter a valid number")
+                        print(Fore.RESET)
+                    else:
+                        break
+                except Exception:
+                    print(Fore.RED)
+                    print("Please enter a valid number")
+                    print(Fore.RESET)
+            number_bot = random.randint(0, 1000)
+            if number_user == number_bot:
+                print(Fore.GREEN)
+                print("You Won your coins will be multiply by x750")
+                print(Fore.RESET)
+                coins_to_give = bet * 750
+                coins = coins + coins_to_give
+                update_coins(coins)
+                input()
+                game_guess_the_number()
+            else:
+                print(Fore.RED)
+                print(f"You lose the bot had {number_bot} all your coins are gone")
+                print(Fore.RESET)
+                update_coins(coins)
+                input()
+                game_guess_the_number()
+        else:
+            game_guess_the_number()
+    if game == 0:
+        print(Fore.GREEN)
+        # TODO rules
+        print("")
+        input()
+        print(Fore.RESET)
+        game_black_jack()
+    if game == 2:
+        get_game()
+
 
 def game_black_jack():
     clear_console()
@@ -102,7 +255,7 @@ def game_black_jack():
                     dealer_amount = 19
                     while True:
                         probability = random.randint(1, 100)
-                        if probability <=70 and probability >0: #70 Prozent
+                        if probability <= 70 and probability > 0:  # 70 %
                             dealer_amount = dealer_amount - 1
                         else:
                             break
@@ -167,7 +320,7 @@ def get_game():
         print("Please enter a valid number")
         get_game()
     if game == 0:
-        pass
+        game_guess_the_number()
     if game == 1:
         game_black_jack()
     if game == 2:
