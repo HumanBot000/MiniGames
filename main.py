@@ -1,33 +1,35 @@
 import os
+import platform
 import random
 import re
-import psutil
-import time
-import random
-import math
-import platform
+
 import GPUtil
-import colorama
-from datetime import datetime
+import psutil
 from colorama import Fore
 
-def  disk_adjustsize(size):
+
+def disk_adjustsize(size):
     factor = 1024
     for i in ["B", "KB", "MB", "GB", "TB", "PB"]:
         if size > factor:
             size = size / factor
         else:
             return f"{size:.3f}{i}"
+
+
 def get_coins():
     settings_file = open("settings.txt", "r+")
     coins = settings_file.readlines()[0]
     coins = int(re.split(":", coins)[1])
     return coins
+
+
 def get_version():
     settings_file = open("settings.txt", "r+")
     version = settings_file.readlines()[1]
     version = str(re.split(":", version)[1])
     return version
+
 
 def clear_console():
     if os.name == 'nt':
@@ -73,21 +75,20 @@ def settings(coins):
         coins = coins - coins_to_clear
         update_coins(coins)
     elif setting == 3:
-        allowed = str(input("To make it a lot easier to debug we collect some datas like operating system and free memory\n"
-                            "is that okay for you? (y/n):"))
+        allowed = str(
+            input("To make it a lot easier to debug we collect some datas like operating system and free memory\n"
+                  "is that okay for you? (y/n):"))
         if allowed == "y":
             disk_io = psutil.disk_io_counters()
             partitions = psutil.disk_partitions()
             virtual_memory = psutil.virtual_memory()
             uname = platform.uname()
-            boot_time_timestamp = psutil.boot_time()
-            bt = datetime.fromtimestamp(boot_time_timestamp)
             swap = psutil.swap_memory()
-            if_addrs = psutil.net_if_addrs()
-            print(f"{Fore.LIGHTBLUE_EX}Mini Games is a collection od classic mini and casino games with it's own money system.\n"
-                  f"If you want to create a bug/issue report at https://github.com/HumanBot000/MiniGames/issues please copy the text below."
-                  f"This makes it a lot easier to debug:\n\n"
-                  f"{Fore.RED}\n")
+            print(
+                f"{Fore.LIGHTBLUE_EX}Mini Games is a collection od classic mini and casino games with it's own money system.\n"
+                f"If you want to create a bug/issue report at https://github.com/HumanBot000/MiniGames/issues please copy the text below."
+                f"This makes it a lot easier to debug:\n\n"
+                f"{Fore.RED}\n")
             print("-" * 40, "system info read out with python", "-" * 40)
             print(f"Version:{get_version()}")
             print(f"System: {uname.system}")
@@ -96,7 +97,7 @@ def settings(coins):
             print(f"Version: {uname.version}")
             print(f"Machine: {uname.machine}")
             print(f"Processor: {uname.processor}")
-            #print(f"Boot Time: {bt.day}.{bt.month}.{bt.year}         {bt.hour}:{bt.minute}: {bt.second} ")
+            # print(f"Boot Time: {bt.day}.{bt.month}.{bt.year}         {bt.hour}:{bt.minute}: {bt.second} ")
             print("Actual Cores:", psutil.cpu_count(logical=False))
             print("Logical Cores:", psutil.cpu_count(logical=True))
             print(f"Max Frequency:, {psutil.cpu_freq().max:.1f}Mhz")
@@ -105,13 +106,13 @@ def settings(coins):
             print("Utilization per core:")
             for i, perc in enumerate(psutil.cpu_percent(percpu=True, interval=1)):
                 print(f"Core {i}: {perc} %")
-            print(f"Total RAM: {disk_adjustsize(virtual_memory.total)}")
+            # print(f"Total RAM: {disk_adjustsize(virtual_memory.total)}")
             print(f"Available RAM: {disk_adjustsize(virtual_memory.available)}")
-            print(f"Used RAM: {virtual_memory.used}")
-            print(f"Percentage of available  RAM: {virtual_memory.percent}%")
-            print(f"Total SWAP: {disk_adjustsize(swap.total)}")
+            # print(f"Used RAM: {virtual_memory.used}")
+            # print(f"Percentage of available  RAM: {virtual_memory.percent}%")
+            # print(f"Total SWAP: {disk_adjustsize(swap.total)}")
             print(f"Free SWAP: {disk_adjustsize(swap.free)}")
-            print(f"Used SWAP: {disk_adjustsize(swap.used)}")
+            # print(f"Used SWAP: {disk_adjustsize(swap.used)}")
             print(f"Percentage SWAP: : {swap.percent}%")
             for p in partitions:
                 print(f"Device: {p.device}")
@@ -123,25 +124,26 @@ def settings(coins):
                     print(Fore.RED)
                     print("Error no permissions")
                     continue
-                #print(f"Total Size: {disk_adjustsize(partitions_usage.total)}")
-                #print(f"Used: {disk_adjustsize(partitions_usage.used)}")
+                # print(f"Total Size: {disk_adjustsize(partitions_usage.total)}")
+                # print(f"Used: {disk_adjustsize(partitions_usage.used)}")
                 print(f"Free: {disk_adjustsize(partitions_usage.free)}")
-                #print(f"Percentage: {partitions_usage.percent}%")
-                print(f"Read since boot: {disk_adjustsize(disk_io.read_bytes)}")
-                print(f"Written since boot {disk_adjustsize(disk_io.write_bytes)}")
-                print("-" * 40, "GPU/Graphic Card", "-" * 40)
-                gpus = GPUtil.getGPUs()
-                for gpu in gpus:
-                    print(f"ID: {gpu.id}")
-                    print(f"Name: {gpu.name}")
-                    print(f"\tLoad: {gpu.load * 100}%")
-                    print(f"Free mem: {gpu.memoryFree}MB")
-                    print(f"Used mem: {gpu.memoryUsed}MB")
-                    print(f"\tTotal Mem: {gpu.memoryTotal}MB")
-                    print(f"Temperature: {gpu.temperature}°C")
+                # print(f"Percentage: {partitions_usage.percent}%")
+                # print(f"Read since boot: {disk_adjustsize(disk_io.read_bytes)}")
+                # print(f"Written since boot {disk_adjustsize(disk_io.write_bytes)}")
+            # print("-" * 40, "GPU/Graphic Card", "-" * 40)
+            gpus = GPUtil.getGPUs()
+            # for gpu in gpus:
+            # print(f"ID: {gpu.id}")
+            # print(f"Name: {gpu.name}")
+            # print(f"\tLoad: {gpu.load * 100}%")
+            # print(f"Free mem: {gpu.memoryFree}MB")
+            # print(f"Used mem: {gpu.memoryUsed}MB")
+            # print(f"\tTotal Mem: {gpu.memoryTotal}MB")
+            # print(f"Temperature: {gpu.temperature}°C")
         else:
-            print(f"{Fore.LIGHTBLUE_EX}Mini Games is a collection od classic mini and casino games with it's own money system.\n"
-                  f"Please create a bug/issue report at https://github.com/HumanBot000/MiniGames/issues")
+            print(
+                f"{Fore.LIGHTBLUE_EX}Mini Games is a collection od classic mini and casino games with it's own money system.\n"
+                f"Please create a bug/issue report at https://github.com/HumanBot000/MiniGames/issues")
         input()
         print(Fore.RESET)
     elif setting == 0:
@@ -149,13 +151,16 @@ def settings(coins):
     print(Fore.RESET)
     settings(coins)
 
-def validate_int(int):
+
+def validate_int(number):
     try:
-        int = int(int)
+        number = int(number)
     except Exception:
         return False
     else:
-        return True
+        return number
+
+
 def game_guess_the_number():
     clear_console()
     print(Fore.RESET)
@@ -295,10 +300,11 @@ def game_guess_the_number():
             game_guess_the_number()
     if game == 0:
         print(Fore.GREEN)
-        print("Inputs: \n bet: [a number between 0 and your  coins] the bet you like to set \n range[1-3] \n guess[0-range] your guess \n"
-              "First you set your coins to bet\n"
-              "After that you decide for a range than higher the range is, than higher is also the multiplier\n"
-              "Then you have to choose a number.Your goal is to have the same number like the bot.")
+        print(
+            "Inputs: \n bet: [a number between 0 and your  coins] the bet you like to set \n range[1-3] \n guess[0-range] your guess \n"
+            "First you set your coins to bet\n"
+            "After that you decide for a range than higher the range is, than higher is also the multiplier\n"
+            "Then you have to choose a number.Your goal is to have the same number like the bot.")
         input()
         print(Fore.RESET)
         game_black_jack()
@@ -351,7 +357,7 @@ def game_black_jack():
                             break
                     if own_amount == dealer_amount:
                         print(Fore.YELLOW)
-                        print("Its a tie you get your coins back")
+                        print("Its a draw you get your coins back")
                         print(Fore.RESET)
                         coins = coins + bet
                         update_coins(coins)
@@ -390,7 +396,7 @@ def game_black_jack():
               "The goal is to reach the highest score.But be carefully if your score gets over 20 the game will end any you loes your coins.\n"
               "If you compare to the dealer the dealer starts at 19 and with a probability of 70% it will go one lower.\n"
               "Coins: You lose = bet is gone\n"
-              "Tie = get your bet back\n"
+              "Draw = get your bet back\n"
               "Win = multiple by 2 ")
         input()
         print(Fore.RESET)
@@ -399,12 +405,91 @@ def game_black_jack():
         get_game()
 
 
+def game_jackpot():
+    clear_console()
+    print(Fore.CYAN)
+    coins  = get_coins()
+    coins_start = coins
+    task = str(input("Please select a Task:    [0] Rules | [1] Play  | [2] Back:"))
+    print(task)
+    if validate_int(task) == False and task !="0":
+        print(Fore.RED)
+        print("Please enter a valid number")
+        print(Fore.RESET)
+        game_jackpot()
+    else:
+        if validate_int(task) >= 0 and validate_int(task) <= 2:
+            task = int(task)
+            if task == 0:
+                print(Fore.GREEN)
+                print(f"Inputs: \n bet: [a number between 0 and your  coins] the bet you like to set \n action:[0,1]\n"
+                      f"The Game:you have a multiplier at the beginning its by x0 than you decide if you want to raise it \n"
+                      f"or end the game if you raise it you have a 50%/33% chance to double the multiplier 0 -> 2 -> 4 -> ...\n"
+                      f"If you are unlucky all your coins are away\n"
+                      f"Note if you end with a x0 multiplier your coins are also gone")
+                print(Fore.RESET)
+            elif task == 1:
+                print(Fore.YELLOW)
+                bet = validate_int(input(f"How much do you bet?:"))
+                print(Fore.RESET)
+                if bet == False:
+                    game_jackpot()
+                else:
+                    if bet <= coins:
+                        coins = coins - bet
+                        multiplier = 0
+                        while True:
+                            task = validate_int(
+                                input(f"{Fore.MAGENTA}The multiplier is now {Fore.RED}x{multiplier}{Fore.MAGENTA}\n"
+                                      f"What do you do?   [0] End Game | [1] Raise Multiplier:{Fore.RESET}"))
+                            if task == 0:
+                                coins_tg = bet * multiplier
+                                coins = coins + coins_tg
+                                update_coins(coins)
+                                print(
+                                    f"{Fore.GREEN}You ended with x{multiplier}{Fore.RESET}")
+                                input()
+                                game_jackpot()
+                            if task == 1:
+                                if multiplier == 0:
+                                    if random.randint(1, 2) == 1:  # 50%
+                                        multiplier = 2
+                                    else:
+                                        update_coins(coins)
+                                        print(
+                                            f"{Fore.GREEN}You lost with x{multiplier}{Fore.RESET}")
+                                        input()
+                                        game_jackpot()
+                                else:
+                                    if random.randint(1, 3) == 1:  # 33%
+                                        multiplier = multiplier * 2
+                                    else:
+                                        update_coins(coins)
+                                        print(
+                                            f"{Fore.GREEN}You lost with x{multiplier}{Fore.RESET}")
+                                        input()
+                                        game_jackpot()
+                    else:
+                        print(f"{Fore.RED}You only have {coins} coins {Fore.RESET}")
+                        input()
+                        game_jackpot()
+            elif task == 2:
+                get_game()
+        else:
+            print(Fore.RED)
+            print("Please enter a valid number")
+            print(Fore.RESET)
+            game_jackpot()
+    print(Fore.RESET)
+
+
 def get_game():
     clear_console()
     print(Fore.RESET)
     print(Fore.CYAN)
     try:
-        game = int(input("Please select a game:    [0] Back | [1] Guess the Number | [2] Black Jack:"))
+        game = int(
+            input("Please select a game:    [0] Back | [1] Guess the Number | [2] Black Jack | [3] Jackpot Game:"))
     except Exception:
         print(Fore.RED)
         print("Please enter a valid number")
@@ -413,6 +498,8 @@ def get_game():
         game_guess_the_number()
     elif game == 2:
         game_black_jack()
+    elif game == 3:
+        game_jackpot()
     elif game == 0:
         main()
 
@@ -441,6 +528,9 @@ def main():
         settings(coins)
     if game == 2:
         get_game()
-
+    else:
+        main()
 
 main()
+
+# TODO check for negativ money
