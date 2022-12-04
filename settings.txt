@@ -1,1 +1,2 @@
-money:2567
+money:100
+version:v2.0
