@@ -41,7 +41,9 @@ def update_coins(coins):
     settings_file = open("settings.txt", "r+").readlines()
     os.remove("settings.txt")
     f = open('settings.txt', 'a')
-    f.write(f"money:{coins}\n")
+    data = settings_file
+    data[0] = f"money:{coins}\n"
+    f.writelines(data)
 
 
 def settings(coins):
@@ -119,6 +121,8 @@ def game_guess_the_number():
                 print(Fore.RED)
                 print(f"You only have {coins} coins")
                 print(Fore.RESET)
+                game_guess_the_number()
+            if coins  <0:
                 game_guess_the_number()
         except Exception:
             print(Fore.RED)
@@ -271,6 +275,11 @@ def game_black_jack():
                 print(f"You only have {coins} coins")
                 print(Fore.RESET)
                 game_black_jack()
+                input()
+            if bet < 0:
+                print("please enter a valid number")
+                input()
+                game_black_jack()
         except Exception:
             print(Fore.RED)
             print("Please enter a valid number")
@@ -366,6 +375,8 @@ def game_jackpot():
                       f"or end the game if you raise it you have a 40% chance to double the multiplier 0 -> 2 -> 4 -> ...\n"
                       f"If you are unlucky all your coins are away\n"
                       f"Note if you end with a x0 multiplier your coins are also gone")
+                input()
+                game_jackpot()
                 print(Fore.RESET)
             elif task == 1:
                 print(Fore.YELLOW)
