@@ -20,7 +20,7 @@ def get_coins():
     coins = int(re.split(":", coins)[1])
     if coins <= 0:
         coins = 0
-    return coins
+    return int(coins)
 
 
 def get_version():
@@ -96,7 +96,7 @@ def validate_int(number):
     except Exception:
         return False
     else:
-        if number >=0:
+        if number >= 0:
             return number
         else:
             return False
@@ -122,7 +122,7 @@ def game_guess_the_number():
                 print(f"You only have {coins} coins")
                 print(Fore.RESET)
                 game_guess_the_number()
-            if coins  <0:
+            if coins < 0:
                 game_guess_the_number()
         except Exception:
             print(Fore.RED)
@@ -359,7 +359,6 @@ def game_jackpot():
     coins = get_coins()
     coins_start = coins
     task = str(input("Please select a Task:    [0] Rules | [1] Play  | [2] Back:"))
-    print(task)
     if validate_int(task) == False and task != "0":
         print(Fore.RED)
         print("Please enter a valid number")
@@ -426,13 +425,127 @@ def game_jackpot():
     print(Fore.RESET)
 
 
+def game_psr():
+    clear_console()
+    print(Fore.CYAN)
+    coins = get_coins()
+    while True:
+        try:
+            print(Fore.CYAN)
+            task = int(input("Please select a Task:    [0] Rules | [1] Play  | [2] Back:"))
+        except Exception:
+            print(f"{Fore.RED}Please enter a valid number{Fore.RESET}")
+        else:
+            break
+    if task == 2:
+        get_game()
+    elif task == 0:
+        print(Fore.GREEN)
+        print("Inputs: \n bet: [a number between 0 and your  coins] the bet you like to set \n action:[1,2,3]\n"
+              "The Game: \nYou don´t know the game?It´s iconic just google it.\nThe multiplier is 2x")
+        print(Fore.RESET)
+        input()
+        game_psr()
+    elif task == 1:
+        while True:
+            try:
+                print(Fore.YELLOW)
+                bet_coins = int(input("How much do you bet?:"))
+            except Exception:
+                print(f"{Fore.RED}Please enter a valid number{Fore.RESET}")
+            else:
+                if bet_coins <= int(get_coins()) and bet_coins >= 0:
+                    break
+                else:
+                    print(f"{Fore.RED}You don´t have enough coins")
+        while True:
+            try:
+                print(Fore.CYAN)
+                p_choice = int(input("What do you choose:    [1] Paper | [2] Scissors | [3] Rock:"))
+            except Exception:
+                print(f"{Fore.RED}Please enter a valid number{Fore.RESET}")
+            else:
+                break
+        b_choice = random.randint(1, 3)
+        if p_choice == 1:
+            if b_choice == 1:
+                print(Fore.YELLOW)
+                print("Its a draw you get your coins back")
+                print(Fore.RESET)
+                input()
+                game_psr()
+            elif b_choice == 2:
+                print(Fore.RED)
+                print(f"You loosed the bot chose {b_choice}  your coins are gone")
+                print(Fore.RESET)
+                coins_tg = coins - bet_coins
+                update_coins(coins_tg)
+                input()
+                game_psr()
+            elif b_choice == 3:
+                print(Fore.GREEN)
+                print(f"You won the bot chose {b_choice}")
+                print(Fore.RESET)
+                coins_tg = coins + bet_coins
+                update_coins(coins_tg)
+                input()
+                game_psr()
+        elif p_choice == 2:
+            if b_choice == 2:
+                print(Fore.YELLOW)
+                print("Its a draw you get your coins back")
+                print(Fore.RESET)
+                input()
+                game_psr()
+            elif b_choice == 3:
+                print(Fore.RED)
+                print(f"You loosed the bot chose {b_choice}  your coins are gone")
+                print(Fore.RESET)
+                coins_tg = coins - bet_coins
+                update_coins(coins_tg)
+                input()
+                game_psr()
+            elif b_choice == 1:
+                print(Fore.GREEN)
+                print(f"You won the bot chose {b_choice}")
+                print(Fore.RESET)
+                coins_tg = coins + bet_coins
+                update_coins(coins_tg)
+                input()
+                game_psr()
+        elif p_choice == 3:
+            if b_choice == 3:
+                print(Fore.YELLOW)
+                print("Its a draw you get your coins back")
+                print(Fore.RESET)
+                input()
+                game_psr()
+            elif b_choice == 1:
+                print(Fore.RED)
+                print(f"You loosed the bot chose {b_choice}  your coins are gone")
+                print(Fore.RESET)
+                coins_tg = coins - bet_coins
+                update_coins(coins_tg)
+                input()
+                game_psr()
+            elif b_choice == 2:
+                print(Fore.GREEN)
+                print(f"You won the bot chose {b_choice}")
+                print(Fore.RESET)
+                coins_tg = coins + bet_coins
+                update_coins(coins_tg)
+                input()
+                game_psr()
+
+
 def get_game():
     clear_console()
     print(Fore.RESET)
     print(Fore.CYAN)
     try:
         game = int(
-            input("Please select a game:    [0] Back | [1] Guess the Number | [2] Black Jack | [3] Jackpot Game:"))
+            input(
+                "Please select a game:    [0] Back | [1] Guess the Number | [2] Black Jack | [3] Jackpot Game [4] Paper-Scissors-Rock:"))
     except Exception:
         print(Fore.RED)
         print("Please enter a valid number")
@@ -443,6 +556,8 @@ def get_game():
         game_black_jack()
     elif game == 3:
         game_jackpot()
+    elif game == 4:
+        game_psr()
     elif game == 0:
         main()
 
