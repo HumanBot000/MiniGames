@@ -1,5 +1,7 @@
 import datetime
 import random
+
+import aiohttp
 import nextcord
 import asyncio
 from nextcord.ext import commands
@@ -84,16 +86,38 @@ async def slot(interaction: Interaction):
         await interaction.send(embed=slot_win_embed)
     else:
         await interaction.send(embed=slot_lose_embed)
+
+
 @bot.slash_command(description="See your ping", guild_ids=guild_ids)
 async def ping(interaction):
     embed = nextcord.Embed(title="Ping? Pong!",
-                          colour=nextcord.Colour(0xc44790), url="https://discordapp.com",
-                          description=f"Pong 🏓{round(bot.latency * 1000, 1)}ms",
-                          timestamp=datetime.datetime.utcfromtimestamp(1673626739))
+                           colour=nextcord.Colour(0xc44790), url="https://discordapp.com",
+                           description=f"Pong 🏓{round(bot.latency * 1000, 1)}ms",
+                           timestamp=datetime.datetime.utcfromtimestamp(1673626739))
 
     embed.set_footer(text="footer text", icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
-    #Todo Footer
+    # Todo Footer
     await interaction.send(embed=embed)
+
+
+@bot.slash_command(description="Reddit Memes", guild_ids=guild_ids)
+async def meme(interaction: Interaction,
+                              thread: str = SlashOption(
+                                  name="thread",
+                                  choices=["dankmemes", "memes", "Programmerhumor", "deutschememes"]
+                              )):
+    embed = nextcord.Embed(colour=nextcord.Colour.random())
+    async with aiohttp.ClientSession() as cs:
+        try:
+            async with cs.get(f'https://www.reddit.com/r/{thread}/new.json?sort=hot') as r:
+                res = await r.json()
+                embed.set_image(
+                    url=res['data']['children'][random.randint(0, len(res['data']['children']))]['data']['url'])
+            embed.set_footer(text=f"r/{thread}")
+        except Exception:
+            embed = nextcord.Embed(colour=nextcord.Colour(color_red), title="Error please try again")
+    await interaction.send(embed=embed)
+
 
 @bot.slash_command(description="flip a coin", guild_ids=guild_ids)
 async def coinflip(interaction: Interaction,
@@ -101,8 +125,31 @@ async def coinflip(interaction: Interaction,
                        name="value",
                        choices=["head", "tails"]
                    )):
-    choices = ["head", "tails"]
-    random_choice = random.choice(choices)
+
+    head_embed = nextcord.Embed(title="Coin flip", colour=nextcord.Colour.random(),
+                           timestamp=datetime.datetime.now())
+
+    head_embed.set_image(url="https://cdn.pixabay.com/photo/2018/04/29/19/47/five-3360941_960_720.jpg")
+    head_embed.set_footer(text="flipping")
+    # ----------------------------------------------------------------------------------------------
+    tails_embed = nextcord.Embed(title="Coin flip", colour=nextcord.Colour.random(),
+                           timestamp=datetime.datetime.now())
+
+    tails_embed.set_image(url="https://cdn.pixabay.com/photo/2019/08/07/21/06/money-4391562_960_720.jpg")
+    tails_embed.set_footer(text="flipping")
+    msg = await interaction.send(embed=head_embed)
+    for i in range(0, random.randint(3, 7)):
+        await asyncio.sleep(1)
+        await msg.edit(embed=tails_embed)
+        await asyncio.sleep(1)
+        await msg.edit(embed=head_embed)
+    await asyncio.sleep(random.randint(2, 4))
+    sites = ["Tails", "Heads"]
+    random_choice = random.choice(sites)
+    if random_choice == "Tails":
+        await msg.edit(embed=tails_embed)
+    else:
+        await msg.edit(embed=head_embed)
     cf_win_embed = nextcord.Embed(title="You have won!",
                                   description=f":coin: {random_choice}",
                                   color=0x2ecc71)
