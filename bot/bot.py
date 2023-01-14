@@ -34,8 +34,8 @@ async def status_task():
         await asyncio.sleep(15)
 
 
-@bot.slash_command(description="shows you all commands", guild_ids=guild_ids)
-async def help(interaction: Interaction):
+@bot.slash_command(description="shows you all commands", guild_ids=guild_ids, name="help")
+async def help_command(interaction: Interaction):
     help_embed = nextcord.Embed(title="Commands:",
                                 description="**/help** shows a view of all commands\n"
                                             "**/rock_paper_scissors** starts a new game\n"
