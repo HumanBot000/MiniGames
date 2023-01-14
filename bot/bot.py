@@ -43,6 +43,15 @@ async def hilfe(interaction: Interaction):
     await interaction.send(embed=help_embed)
 
 
+@bot.slash_command(description="See your ping", guild_ids=guild_ids)
+async def ping(interaction):
+    ping_embed = nextcord.Embed(title="Ping? Pong!",
+                                colour=nextcord.Colour(0xc44790),
+                                description=f"Pong 🏓{round(bot.latency * 1000, 1)}ms",
+                                timestamp=datetime.datetime.utcfromtimestamp(1673626739))
+    await interaction.send(embed=ping_embed)
+
+
 @bot.slash_command(description="Rock, Paper, Scissors ", guild_ids=guild_ids)
 async def rock_paper_scissors(interaction: Interaction,
                               value: str = SlashOption(
