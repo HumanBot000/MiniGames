@@ -6,7 +6,9 @@ from nextcord import Interaction, SlashOption
 
 intents = nextcord.Intents().all()
 bot = commands.Bot(command_prefix="Use slash commands", intents=intents)
-
+color_blue = 0x3498db
+color_red = 0xe74c3c
+color_green = 0x2ecc71
 guild_ids = [1063461326900445225]
 
 
@@ -18,12 +20,6 @@ async def on_ready():
         guild_count += 1
         print(f"{guild_count}. Server-Name: {guild.name}")
     print(f"Anzahl Server:  {guild_count}")
-
-
-# 0x3498db -->  blue   --> System
-# 0xe74c3c -->  red    --> Lost
-# 0x2ecc71 -->  green  --> Win
-# 0xc27a2c -->  orange --> Draw
 
 
 async def status_task():
@@ -49,8 +45,11 @@ async def help(interaction: Interaction):
 async def rock_paper_scissors(interaction: Interaction,
                               value: str = SlashOption(
                                   name="value",
-                                  choices=["🪨", "📄", "✂"]
+                                  choices=["🪨Rock", "📄Paper", "✂Scissors"]
                               )):
+    if value == "🪨Rock": value = "🪨"
+    elif value == "📄Paper": value = "📄"
+    else: value = "✂"
     random_option = random.choice(["📄", "✂", "🪨"])
     rps_draw_embed = nextcord.Embed(title="You have a draw!",
                                     description=f"{value}  **:**  {random_option}",
