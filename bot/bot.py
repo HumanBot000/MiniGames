@@ -1,3 +1,4 @@
+import datetime
 import random
 import nextcord
 import asyncio
@@ -83,7 +84,16 @@ async def slot(interaction: Interaction):
         await interaction.send(embed=slot_win_embed)
     else:
         await interaction.send(embed=slot_lose_embed)
+@bot.slash_command(description="See your ping", guild_ids=guild_ids)
+async def ping(interaction):
+    embed = nextcord.Embed(title="Ping? Pong!",
+                          colour=nextcord.Colour(0xc44790), url="https://discordapp.com",
+                          description=f"Pong 🏓{round(bot.latency * 1000, 1)}ms",
+                          timestamp=datetime.datetime.utcfromtimestamp(1673626739))
 
+    embed.set_footer(text="footer text", icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
+    #Todo Footer
+    await interaction.send(embed=embed)
 
 @bot.slash_command(description="flip a coin", guild_ids=guild_ids)
 async def coinflip(interaction: Interaction,
