@@ -1,11 +1,11 @@
+import asyncio
 import datetime
 import random
 
 import aiohttp
 import nextcord
-import asyncio
-from nextcord.ext import commands
 from nextcord import Interaction, SlashOption
+from nextcord.ext import commands
 
 intents = nextcord.Intents().all()
 bot = commands.Bot(command_prefix="Use slash commands", intents=intents)
@@ -44,6 +44,28 @@ async def help_command(interaction: Interaction):
                                             "**/meme** see memes from reddit",
                                 color=0x3498db)
     await interaction.send(embed=help_embed)
+
+
+@bot.slash_command(description="Guess a given number", guild_ids=guild_ids, name="numberguess")
+async def gtn(interaction: Interaction,
+              number: int,
+              value: str = SlashOption(
+                  name="range",
+                  choices=["1-10", "1-100", "1-1000"]
+              )):
+    value = int(value.split("-")[1])
+    random_number = random.randint(1, value)
+    gtn_win_embed = nextcord.Embed(title="You have won!",
+                                  description=f"You have won the nuber was: {random_number}!",
+                                  color=color_green)
+    gtn_lose_embed = nextcord.Embed(title="You have lost!",
+                                   description=f"You have lost the nuber was: {random_number}!",
+                                   color=color_orange)
+    if random_number == value:
+        await interaction.send(embed=gtn_win_embed)
+    else:
+        await interaction.send(embed=gtn_lose_embed)
+
 
 
 @bot.slash_command(description="rock, paper, Scissors", guild_ids=guild_ids)
@@ -103,10 +125,10 @@ async def ping(interaction):
 
 @bot.slash_command(description="Reddit Memes", guild_ids=guild_ids)
 async def meme(interaction: Interaction,
-                              thread: str = SlashOption(
-                                  name="thread",
-                                  choices=["dankmemes", "memes", "Programmerhumor", "deutschememes"]
-                              )):
+               thread: str = SlashOption(
+                   name="thread",
+                   choices=["dankmemes", "memes", "Programmerhumor", "deutschememes"]
+               )):
     embed = nextcord.Embed(colour=nextcord.Colour.random())
     async with aiohttp.ClientSession() as cs:
         try:
@@ -126,15 +148,14 @@ async def coinflip(interaction: Interaction,
                        name="value",
                        choices=["head", "tails"]
                    )):
-
     head_embed = nextcord.Embed(title="Coin flip", colour=nextcord.Colour.random(),
-                           timestamp=datetime.datetime.now())
+                                timestamp=datetime.datetime.now())
 
     head_embed.set_image(url="https://cdn.pixabay.com/photo/2018/04/29/19/47/five-3360941_960_720.jpg")
     head_embed.set_footer(text="flipping")
     # ----------------------------------------------------------------------------------------------
     tails_embed = nextcord.Embed(title="Coin flip", colour=nextcord.Colour.random(),
-                           timestamp=datetime.datetime.now())
+                                 timestamp=datetime.datetime.now())
 
     tails_embed.set_image(url="https://cdn.pixabay.com/photo/2019/08/07/21/06/money-4391562_960_720.jpg")
     tails_embed.set_footer(text="flipping")
