@@ -4,9 +4,9 @@ import random
 
 import aiohttp
 import nextcord
-from nextcord import Interaction, SlashOption
+from nextcord import Interaction, SlashOption, ButtonStyle
 from nextcord.ext import commands
-
+from nextcord.ui import Button,View
 intents = nextcord.Intents().all()
 bot = commands.Bot(command_prefix="Use slash commands", intents=intents)
 color_blue = 0x3498db
@@ -41,6 +41,7 @@ async def help_command(interaction: Interaction):
                                             "**/rock_paper_scissors** starts a new game\n"
                                             "**/slot** spins the slot machine\n"
                                             "**/coinflip** flip a coin\n"
+                                            "**/numberguess** guess the number in a specific range\n"
                                             "**/meme** see memes from reddit",
                                 color=0x3498db)
     await interaction.send(embed=help_embed)
@@ -56,16 +57,15 @@ async def gtn(interaction: Interaction,
     value = int(value.split("-")[1])
     random_number = random.randint(1, value)
     gtn_win_embed = nextcord.Embed(title="You have won!",
-                                  description=f"You have won the nuber was: {random_number}!",
-                                  color=color_green)
+                                   description=f"You have won the nuber was: {random_number}!",
+                                   color=color_green)
     gtn_lose_embed = nextcord.Embed(title="You have lost!",
-                                   description=f"You have lost the nuber was: {random_number}!",
-                                   color=color_orange)
+                                    description=f"You have lost the nuber was: {random_number}!",
+                                    color=color_orange)
     if random_number == value:
         await interaction.send(embed=gtn_win_embed)
     else:
         await interaction.send(embed=gtn_lose_embed)
-
 
 
 @bot.slash_command(description="rock, paper, Scissors", guild_ids=guild_ids)
@@ -140,6 +140,31 @@ async def meme(interaction: Interaction,
         except Exception:
             embed = nextcord.Embed(colour=nextcord.Colour(color_red), title="Error please try again")
     await interaction.send(embed=embed)
+
+
+@bot.slash_command(description="Play Black Jack", guild_ids=guild_ids)
+async def blackjack(interaction):
+    player_count = 0
+    dealer_count = random.randint(1, 3)
+    if dealer_count == 1:
+        dealer_count = random.randint(17, 20)
+    else:
+        dealer_count = random.randint(20, 24)
+    async def rise(interaction,player_count=player_count,m=1):
+        player_count += random.randint(1,5)
+        if m == 1:
+            await run(player_count)
+        else:
+            return player_count
+    rise_button = Button(label="Rise count by 1 to 5", style=ButtonStyle.primary, emoji="⬆")
+    exit_button = Button(label="Compare to dealer", style=ButtonStyle.secondary, emoji="🚪")
+    rise_button.callback = rise
+    view = View(timeout=300)
+    view.add_item(rise_button)
+    view.add_item(exit_button)
+    msg = await interaction.send(f"The maximum is 25,you have {player_count} what do you like to do?", view=view)
+    async def run(player_count):
+        await msg.edit(f"The maximum is 25,you have {player_count} what do you like to do?",view=view)
 
 
 @bot.slash_command(description="flip a coin", guild_ids=guild_ids)
