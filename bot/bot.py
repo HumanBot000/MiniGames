@@ -40,7 +40,8 @@ async def help_command(interaction: Interaction):
                                 description="**/help** shows a view of all commands\n"
                                             "**/rock_paper_scissors** starts a new game\n"
                                             "**/slot** spins the slot machine\n"
-                                            "**/coinflip** flip a coin",
+                                            "**/coinflip** flip a coin\n"
+                                            "**/meme** see memes from reddit",
                                 color=0x3498db)
     await interaction.send(embed=help_embed)
 
