@@ -9,6 +9,7 @@ bot = commands.Bot(command_prefix="Use slash commands", intents=intents)
 color_blue = 0x3498db
 color_red = 0xe74c3c
 color_green = 0x2ecc71
+color_orange = 0xc27a2c
 guild_ids = [1063461326900445225]
 
 
@@ -47,9 +48,6 @@ async def rock_paper_scissors(interaction: Interaction,
                                   name="value",
                                   choices=["🪨Rock", "📄Paper", "✂Scissors"]
                               )):
-    if value == "🪨Rock": value = "🪨"
-    elif value == "📄Paper": value = "📄"
-    else: value = "✂"
     random_option = random.choice(["📄", "✂", "🪨"])
     rps_draw_embed = nextcord.Embed(title="You have a draw!",
                                     description=f"{value}  **:**  {random_option}",
