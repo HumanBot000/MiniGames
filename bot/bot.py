@@ -6,7 +6,8 @@ import aiohttp
 import nextcord
 from nextcord import Interaction, SlashOption, ButtonStyle
 from nextcord.ext import commands
-from nextcord.ui import Button,View
+from nextcord.ui import Button, View
+
 intents = nextcord.Intents().all()
 bot = commands.Bot(command_prefix="Use slash commands", intents=intents)
 color_blue = 0x3498db
@@ -25,13 +26,13 @@ async def on_ready():
         print(f"{guild_count}. Server-Name: {guild.name}")
     print(f"Anzahl Server:  {guild_count}")
 
-
 async def status_task():
+    all_commands = [c.name for c in bot.commands]
+    all_commands.append("In development")
+    all_commands.append("/help for more infos")
     while True:
-        await bot.change_presence(activity=nextcord.Game("/help"), status=nextcord.Status.online)
-        await asyncio.sleep(15)
-        await bot.change_presence(activity=nextcord.Game("In development"), status=nextcord.Status.online)
-        await asyncio.sleep(15)
+        await bot.change_presence(activity=nextcord.Game(random.choice(all_commands)), status=nextcord.Status.online)
+        await asyncio.sleep(random.randint(10,20))
 
 
 @bot.slash_command(description="shows you all commands", guild_ids=guild_ids, name="help")
@@ -42,6 +43,7 @@ async def help_command(interaction: Interaction):
                                             "**/slot** spins the slot machine\n"
                                             "**/coinflip** flip a coin\n"
                                             "**/numberguess** guess the number in a specific range\n"
+                                            "/approach_missle come as near as posible to the target.But be carefully\n"
                                             "**/meme** see memes from reddit",
                                 color=0x3498db)
     await interaction.send(embed=help_embed)
@@ -105,10 +107,14 @@ async def slot(interaction: Interaction):
     slot_lose_embed = nextcord.Embed(title="You have lost!",
                                      description=f"[{random_nums[0]}][{random_nums[1]}][{random_nums[2]}]",
                                      color=0xe74c3c)
+    button = Button(label="Play Again", style=ButtonStyle.primary, emoji="🔁")
+    button.callback = approach_missle
+    view = View(timeout=300)
+    view.add_item(button)
     if random_nums[0] == random_nums[1] and random_nums[1] == random_nums[2]:
-        await interaction.send(embed=slot_win_embed)
+        await interaction.send(embed=slot_win_embed,view=view)
     else:
-        await interaction.send(embed=slot_lose_embed)
+        await interaction.send(embed=slot_lose_embed,view=view)
 
 
 @bot.slash_command(description="See your ping", guild_ids=guild_ids)
@@ -118,9 +124,11 @@ async def ping(interaction):
                            description=f"Pong 🏓{round(bot.latency * 1000, 1)}ms",
                            timestamp=datetime.datetime.utcfromtimestamp(1673626739))
 
-    embed.set_footer(text="footer text", icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
-    # Todo Footer
-    await interaction.send(embed=embed)
+    button = Button(label="Try Again", style=ButtonStyle.primary, emoji="🔁")
+    button.callback = ping
+    view = View(timeout=300)
+    view.add_item(button)
+    await interaction.send(embed=embed,view=view)
 
 
 @bot.slash_command(description="Reddit Memes", guild_ids=guild_ids)
@@ -129,6 +137,8 @@ async def meme(interaction: Interaction,
                    name="thread",
                    choices=["dankmemes", "memes", "Programmerhumor", "deutschememes"]
                )):
+    if thread not in ["dankmemes", "memes", "Programmerhumor", "deutschememes"]:
+        thread = "dankmemes"
     embed = nextcord.Embed(colour=nextcord.Colour.random())
     async with aiohttp.ClientSession() as cs:
         try:
@@ -139,32 +149,75 @@ async def meme(interaction: Interaction,
             embed.set_footer(text=f"r/{thread}")
         except Exception:
             embed = nextcord.Embed(colour=nextcord.Colour(color_red), title="Error please try again")
-    await interaction.send(embed=embed)
+    button = Button(label="Show another", style=ButtonStyle.primary, emoji="🔁")
+    button.callback = meme
+    view = View(timeout=300)
+    view.add_item(button)
+    await interaction.send(embed=embed, view=view)
 
 
-@bot.slash_command(description="Play Black Jack", guild_ids=guild_ids)
-async def blackjack(interaction):
+@bot.slash_command(description="Kill your target", guild_ids=guild_ids)
+async def approach_missle(interaction):
+    global player_count
     player_count = 0
-    dealer_count = random.randint(1, 3)
-    if dealer_count == 1:
-        dealer_count = random.randint(17, 20)
-    else:
-        dealer_count = random.randint(20, 24)
-    async def rise(interaction,player_count=player_count,m=1):
-        player_count += random.randint(1,5)
-        if m == 1:
-            await run(player_count)
+
+    async def rise(interaction):
+        global player_count
+        player_count += random.randint(1, 5)
+        await run(player_count)
+
+    async def end(interaction):
+        button = Button(label="Play Again", style=ButtonStyle.primary, emoji="🔁")
+        button.callback = approach_missle
+        view = View(timeout=300)
+        view.add_item(button)
+        target_count = random.randint(1, 3)
+        if target_count == 1:
+            target_count = random.randint(17, 20)
         else:
-            return player_count
+            target_count = random.randint(20, 24)
+
+        global player_count
+        lose_embed = nextcord.Embed(title="You have lost!",
+                                    description=f"you missed your target. Your target had {target_count} points",
+                                    color=color_red)
+        win_embed = nextcord.Embed(title="You have won!",
+                                   description=f"You hit your target it had {target_count} points",
+                                   color=color_green)
+        if player_count > target_count:
+            await interaction.send(embed=win_embed, view=view)
+        else:
+            await interaction.send(embed=lose_embed, view=view)
+
     rise_button = Button(label="Rise count by 1 to 5", style=ButtonStyle.primary, emoji="⬆")
-    exit_button = Button(label="Compare to dealer", style=ButtonStyle.secondary, emoji="🚪")
+    exit_button = Button(label="Compare to Target", style=ButtonStyle.secondary, emoji="🚪")
     rise_button.callback = rise
+    exit_button.callback = end
     view = View(timeout=300)
     view.add_item(rise_button)
     view.add_item(exit_button)
     msg = await interaction.send(f"The maximum is 25,you have {player_count} what do you like to do?", view=view)
+
     async def run(player_count):
-        await msg.edit(f"The maximum is 25,you have {player_count} what do you like to do?",view=view)
+        if player_count > 25:
+            button = Button(label="Play Again", style=ButtonStyle.primary, emoji="🔁")
+            button.callback = approach_missle
+            view = View(timeout=300)
+            view.add_item(button)
+            lose_embed = nextcord.Embed(title="You have lost!",
+                                        description=f"You overloaded your missle.",
+                                        color=color_red)
+            await msg.delete()
+            await interaction.send(embed=lose_embed, view=view)
+        else:
+            rise_button = Button(label="Rise count by 1 to 5", style=ButtonStyle.primary, emoji="⬆")
+            exit_button = Button(label="Compare to Target", style=ButtonStyle.secondary, emoji="🚪")
+            rise_button.callback = rise
+            exit_button.callback = end
+            view = View(timeout=300)
+            view.add_item(rise_button)
+            view.add_item(exit_button)
+            await msg.edit(f"The maximum is 25,you have {player_count} what do you like to do?", view=view)
 
 
 @bot.slash_command(description="flip a coin", guild_ids=guild_ids)
@@ -203,10 +256,14 @@ async def coinflip(interaction: Interaction,
     cf_lose_embed = nextcord.Embed(title="You have lost!",
                                    description=f":coin: {random_choice}",
                                    color=0xe74c3c)
+    button = Button(label="Play Again", style=ButtonStyle.primary, emoji="🔁")
+    button.callback = coinflip
+    view = View(timeout=300)
+    view.add_item(button)
     if random_choice == value:
-        await interaction.send(embed=cf_win_embed)
+        await interaction.send(embed=cf_win_embed, view=view)
     else:
-        await interaction.send(embed=cf_lose_embed)
+        await interaction.send(embed=cf_lose_embed, view=view)
 
 
 bot.run(token=open("token.txt", "r").read())
