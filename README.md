@@ -1,5 +1,5 @@
 # Important
-This projet was the fundation for [Discord Playground]((https://top.gg/bot/1063461122553942077))
+This projet was the fundation for [Discord Playground](https://top.gg/bot/1063461122553942077)
 
 # Installation (For Windows)
 
