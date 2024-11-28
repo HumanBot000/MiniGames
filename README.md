@@ -1,6 +1,5 @@
-#Important
-This project is discontinued and redone with [a discord bot](https://top.gg/bot/1063461122553942077) 
-
+# Important
+This projet was the fundation for [Discord Playground]((https://top.gg/bot/1063461122553942077))
 
 # Installation (For Windows)
 
